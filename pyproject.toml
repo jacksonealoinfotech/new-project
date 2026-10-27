@@ -1,0 +1,139 @@
+[project]
+name = "fastapi-production-template"
+version = "0.1.0"
+description = "Production-ready FastAPI backend starter template following principal engineering standards"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Engineering Team", email = "engineering@example.com" }
+]
+keywords = ["fastapi", "asyncio", "sqlalchemy", "pydantic", "alembic", "redis", "template"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Framework :: FastAPI",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+]
+
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pydantic>=2.8.0",
+    "pydantic-settings>=2.4.0",
+    "sqlalchemy[asyncio]>=2.0.30",
+    "alembic>=1.13.0",
+    "asyncpg>=0.29.0; sys_platform != 'win32'",
+    "aiosqlite>=0.20.0",
+    "redis[hiredis]>=5.0.0",
+    "httpx>=0.27.0",
+    "structlog>=24.2.0",
+    "argon2-cffi>=23.1.0",
+    "pyjwt>=2.8.0",
+    "python-multipart>=0.0.9",
+    "email-validator>=2.2.0",
+    "opentelemetry-api>=1.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
+]
+
+[build-system]
+requires = ["setuptools>=69.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "alembic/versions",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "C",      # flake8-comprehensions
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+    "ASYNC",  # flake8-async
+    "S",      # flake8-bandit (security)
+    "T20",    # flake8-print
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific rules
+]
+ignore = [
+    "E501",   # line length handled by formatter
+    "B008",   # do not perform function calls in argument defaults (FastAPI Depends)
+    "S101",   # use of assert (allowed in tests)
+    "S104",   # binding to 0.0.0.0 allowed for server host configuration
+    "UP046",  # generic type parameters (preserve Generic[T] compatibility)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S105", "S106", "S311"]  # asserts and hardcoded test secrets in tests
+"alembic/**/*.py" = ["E402"]
+"scripts/**/*.py" = ["T201"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "argon2.*",
+    "redis.*",
+    "structlog.*",
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+addopts = "-v --strict-markers -ra"
